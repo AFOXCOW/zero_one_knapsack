@@ -1,20 +1,6 @@
-package zero_one_backpack
+package zero_one_knapsack
 
-import (
-	"strconv"
-)
-
-type thing struct {
-	id     int
-	weight int
-	value  int
-}
-
-func (th thing) String() string {
-	return "ID:" + strconv.Itoa(th.id) + "  weight:" + strconv.Itoa(th.weight) + "  value:" + strconv.Itoa(th.value)
-}
-
-func max(a int, b int) (c int) {
+func max(a float64, b float64) (c float64) {
 	if a > b {
 		c = a
 		return
@@ -22,21 +8,26 @@ func max(a int, b int) (c int) {
 	c = b
 	return
 }
-func Dyn_program(w []int, v []int, capa int, num int) (things []thing, value int) {
-	var tmp [][]int
+
+func Dyn_program(Items ItemsInterface, capa int) (bestItems []Item, value float64) {
+	var tmp [][]float64
+
+	num := Items.Len()
+
 	for i := 0; i < num; i++ {
-		x := make([]int, capa+1)
+		x := make([]float64, capa+1)
 		tmp = append(tmp, x)
 	}
+
 	for j := 1; j < capa+1; j++ {
-		if w[0] <= capa {
-			tmp[0][j] = v[0]
+		if Items.Weight(0) <= capa {
+			tmp[0][j] = Items.Value(0)
 		}
 	}
 	for i := 1; i < num; i++ {
 		for j := 1; j < capa+1; j++ {
-			if j-w[i] >= 0 {
-				tmp[i][j] = max(tmp[i-1][j], v[i]+tmp[i-1][j-w[i]])
+			if j-Items.Weight(i) >= 0 {
+				tmp[i][j] = max(tmp[i-1][j], Items.Value(i)+tmp[i-1][j-Items.Weight(i)])
 			} else {
 				tmp[i][j] = tmp[i-1][j]
 			}
@@ -48,15 +39,15 @@ func Dyn_program(w []int, v []int, capa int, num int) (things []thing, value int
 	value = tmp[i][j]
 	for i > 0 && j > 0 {
 		if tmp[i][j] != tmp[i-1][j] {
-			things = append(things, thing{i, w[i], v[i]})
-			j = j - w[i]
+			bestItems = append(bestItems, Item{i, Items.Weight(i), Items.Value(i)})
+			j = j - Items.Weight(i)
 			i = i - 1
 		} else {
 			i = i - 1
 		}
 	}
 	if i == 0 && j != 0 {
-		things = append(things, thing{i, w[i], v[i]})
+		bestItems = append(bestItems, Item{i, Items.Weight(i), Items.Value(i)})
 	}
 	return
 }

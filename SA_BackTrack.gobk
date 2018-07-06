@@ -1,4 +1,4 @@
-package zero_one_backpack
+package zero_one_knapsack
 
 func exist(arr []int, num int) bool {
 	for i := 0; i < len(arr); i++ {

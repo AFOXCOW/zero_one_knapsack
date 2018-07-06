@@ -1,4 +1,4 @@
-package zero_one_backpack
+package zero_one_knapsack
 
 import (
 	"math"

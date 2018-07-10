@@ -56,16 +56,17 @@ func (pq *PriorityQueue) update(heapnode *HeapNode, level int, value float64, we
 	heap.Fix(pq, heapnode.index)
 }
 
-func max_bound(t int, curr_weight int, curr_value int, capa int, n int, w []int, v []int) (upper float64) {
+func max_bound(t int, curr_weight int, curr_value float64, capa int, Items ItemsInterface) (upper float64) {
+	n := Items.Len()
 	left := capa - curr_weight
 	upper = float64(curr_value)
-	for t < n && w[t] <= left {
-		left -= w[t]
-		upper += float64(v[t])
+	for t < n && Items.Weight(t) <= left {
+		left -= Items.Weight(t)
+		upper += float64(Items.Value(t))
 		t++
 	}
 	if t < n {
-		upper += float64(v[t]) / float64(w[t]) * float64(left)
+		upper += float64(Items.Value(t)) / float64(Items.Weight(t)) * float64(left)
 	}
 	return
 }
@@ -75,29 +76,30 @@ func addLiveNode(pq *PriorityQueue, upper float64, curr_value float64, curr_weig
 		heap.Push(pq, &heapnode)
 	}
 }
-func Max_queue(w []int, v []int, capa int, num int) (bestvalue float64, arr []HeapNode) {
+func Max_queue(Items ItemsInterface, capa int) (bestvalue float64, arr []HeapNode) {
+	num := Items.Len()
 	curr_weight := 0
-	curr_value := 0
+	curr_value := float64(0)
 	var (
 		Lflag bool
 		Rflag bool
 	)
 	i := 0
 	pq := make(PriorityQueue, 0)
-	upper := max_bound(i, curr_weight, curr_value, capa, num, w, v)
+	upper := max_bound(i, curr_weight, curr_value, capa, Items)
 	for true {
 		Lflag = false
 		Rflag = false
-		if i < num && curr_weight+w[i] <= capa {
+		if i < num && curr_weight+Items.Weight(i) <= capa {
 			if float64(upper) > bestvalue {
 				Lflag = true
-				if float64(curr_value+v[i]) > bestvalue {
-					bestvalue = float64(curr_value + v[i])
+				if float64(curr_value+Items.Value(i)) > bestvalue {
+					bestvalue = float64(curr_value + Items.Value(i))
 				}
-				addLiveNode(&pq, upper, float64(curr_value+v[i]), float64(curr_weight+w[i]), i+1, true, num)
+				addLiveNode(&pq, upper, float64(curr_value+Items.Value(i)), float64(curr_weight+Items.Weight(i)), i+1, true, num)
 			}
 		}
-		upper = max_bound(i+1, curr_weight, curr_value, capa, num, w, v)
+		upper = max_bound(i+1, curr_weight, curr_value, capa, Items)
 		if i < num && upper >= bestvalue {
 			Rflag = true
 			addLiveNode(&pq, upper, float64(curr_value), float64(curr_weight), i+1, false, num)
@@ -108,7 +110,7 @@ func Max_queue(w []int, v []int, capa int, num int) (bestvalue float64, arr []He
 		if pq.Len() != 0 {
 			heapnode := heap.Pop(&pq).(*HeapNode)
 			curr_weight = int(heapnode.weight)
-			curr_value = int(heapnode.value)
+			curr_value = heapnode.value
 			upper = heapnode.upper
 			i = heapnode.level
 			arr = append(arr, *heapnode)
@@ -156,10 +158,11 @@ func SortByV_W(w []int, v []int) (weight []int, value []int) {
 	return
 }
 
-func PQpathPrint(arr []bool, num int, weight_bk []int, value_bk []int) {
+func PQpathPrint(arr []bool, Items ItemsInterface) {
+	num := Items.Len()
 	for i := len(arr) - num; i < len(arr); i++ {
 		if arr[i] == true {
-			fmt.Printf("ID : %d  weight : %d value : %d\n", i-len(arr)+num, weight_bk[i-len(arr)+num], value_bk[i-len(arr)+num])
+			fmt.Printf("ID : %d  weight : %d value : %d\n", i-len(arr)+num, Items.Weight(i-len(arr)+num), Items.Value(i-len(arr)+num))
 		}
 	}
 }

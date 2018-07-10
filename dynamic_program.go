@@ -11,19 +11,19 @@ func max(a float64, b float64) (c float64) {
 
 func Dyn_program(Items ItemsInterface, capa int) (bestItems []Item, value float64) {
 	var tmp [][]float64
-
 	num := Items.Len()
-
+	//ceate the space for tmp array
 	for i := 0; i < num; i++ {
 		x := make([]float64, capa+1)
 		tmp = append(tmp, x)
 	}
-
+	//initialize the tmp array
 	for j := 1; j < capa+1; j++ {
 		if Items.Weight(0) <= capa {
 			tmp[0][j] = Items.Value(0)
 		}
 	}
+	//fill the tmp array with the recursive expression
 	for i := 1; i < num; i++ {
 		for j := 1; j < capa+1; j++ {
 			if j-Items.Weight(i) >= 0 {
@@ -34,6 +34,7 @@ func Dyn_program(Items ItemsInterface, capa int) (bestItems []Item, value float6
 
 		}
 	}
+	//from the best value position ,back to the start position to find one of the best value solution.
 	i := num - 1
 	j := capa
 	value = tmp[i][j]

@@ -5,6 +5,11 @@ import (
 	"sort"
 )
 
+/*
+	the defination of the solution tree are as follows.
+	use the Len  Less Swap  to satisfy the sort interface.
+	use the SearchTree to find the nodeid'x' in TreeNodeSlice.
+*/
 type TreeNode struct {
 	nodeid  uint64
 	visited bool
@@ -27,6 +32,10 @@ func SearchTree(a TreeNodeSlice, x uint64) int {
 	return sort.Search(len(a), func(i int) bool { return a[i].nodeid >= x })
 }
 
+/*
+	the node2path`s function is that it can transfer the nodeid to the path from Treeroot to current_node.
+	such as 3 will be transfer to 11.and the 11 means the 0th item and 1th item are choosed.
+*/
 func node2path(current_node uint64) (path []int) {
 	var arr []int
 	for current_node != 0 {
@@ -38,6 +47,10 @@ func node2path(current_node uint64) (path []int) {
 	}
 	return
 }
+
+/*
+	apparently a path got a value so far
+*/
 func path2value(path []int, items ItemsInterface) (sum float64) {
 	sum = 0
 	for i := 0; i < len(path); i++ {
@@ -48,6 +61,10 @@ func path2value(path []int, items ItemsInterface) (sum float64) {
 	return
 }
 
+/*
+	judge the current node.
+	if it`s overweighted then  it`s a dead node.
+*/
 func current_dead(Items ItemsInterface, capa int, curr uint64) bool {
 
 	path := node2path(curr)
@@ -62,6 +79,11 @@ func current_dead(Items ItemsInterface, capa int, curr uint64) bool {
 	}
 	return false
 }
+
+/*
+	if current node is the leaf node.
+	then it`s a optional solution but maybe it`s not the best solution.
+*/
 func end(curr uint64, node_num uint64) bool {
 	if 2*curr+1 >= node_num {
 		return true
@@ -69,6 +91,10 @@ func end(curr uint64, node_num uint64) bool {
 	return false
 }
 
+/*
+	if current node is visited,then return true
+	else return false.
+*/
 func visited(Tree TreeNodeSlice, nodeid uint64) bool {
 	i := SearchTree(Tree, nodeid)
 	if i < len(Tree) && Tree[i].nodeid == nodeid && Tree[i].visited == true {
@@ -77,13 +103,14 @@ func visited(Tree TreeNodeSlice, nodeid uint64) bool {
 		return false
 	}
 }
+
+/*
+	BackTracking function,select the best solution(one of the best) from all optional solution.
+*/
 func BackTracking(Items ItemsInterface, capa int) (bestItems []Item, best_value float64) {
 	var Tree TreeNodeSlice
 	num := Items.Len()
 	node_num := uint64(math.Pow(2, float64(num+1)) - 1)
-
-	//Tree := make([]int, node_num)
-
 	var curr, pre uint64
 	curr, pre = 0, 0
 	var paths [][]int

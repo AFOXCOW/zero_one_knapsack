@@ -6,6 +6,10 @@ import (
 	"sort"
 )
 
+/*
+	the max_heap defination
+	include Len Less Swap Push Pop funtion.
+*/
 type HeapNode struct {
 	upper  float64 //node`s upper board:the priority attribution
 	value  float64 //node`s value
@@ -47,6 +51,9 @@ func (pq *PriorityQueue) Pop() interface{} {
 	return heapnode
 }
 
+/*
+	update the priority queue(max_heap)
+*/
 func (pq *PriorityQueue) update(heapnode *HeapNode, level int, value float64, weight float64, upper float64, lkid bool) {
 	heapnode.level = level
 	heapnode.value = value
@@ -56,6 +63,9 @@ func (pq *PriorityQueue) update(heapnode *HeapNode, level int, value float64, we
 	heap.Fix(pq, heapnode.index)
 }
 
+/*
+	calculate the max_bound of current node.
+*/
 func max_bound(t int, curr_weight int, curr_value float64, capa int, Items ItemsInterface) (upper float64) {
 	n := Items.Len()
 	left := capa - curr_weight
@@ -70,13 +80,22 @@ func max_bound(t int, curr_weight int, curr_value float64, capa int, Items Items
 	}
 	return
 }
+
+/*
+	if the node is alive,it means maybe it contain the best solution.
+	then  add this node to priority queue.
+*/
 func addLiveNode(pq *PriorityQueue, upper float64, curr_value float64, curr_weight float64, level int, lkid bool, num int) {
 	heapnode := HeapNode{upper, curr_value, curr_weight, level, lkid, pq.Len()}
 	if level <= num {
 		heap.Push(pq, &heapnode)
 	}
 }
-func Max_queue(Items ItemsInterface, capa int) (bestvalue float64, arr []HeapNode) {
+
+/*
+	give one of the best solution.
+*/
+func Priority_queue(Items ItemsInterface, capa int) (bestvalue float64, arr []HeapNode) {
 	num := Items.Len()
 	curr_weight := 0
 	curr_value := float64(0)
@@ -119,6 +138,9 @@ func Max_queue(Items ItemsInterface, capa int) (bestvalue float64, arr []HeapNod
 	return
 }
 
+/*
+	same function as the node2path in backtracking file.
+*/
 func Nodes2Path(arr []HeapNode, num int) (path []bool) {
 	for i := 0; i < len(arr); i++ {
 		if arr[len(arr)-1].level != num {
@@ -131,6 +153,10 @@ func Nodes2Path(arr []HeapNode, num int) (path []bool) {
 	return
 }
 
+/*
+	here is the functions used to sort the items by value/weight.
+	in many situation, it would be faster.
+*/
 type Pair struct {
 	key   int
 	Value float64
@@ -158,6 +184,9 @@ func SortByV_W(w []int, v []int) (weight []int, value []int) {
 	return
 }
 
+/*
+	here is the print function.
+*/
 func PQpathPrint(arr []bool, Items ItemsInterface) {
 	num := Items.Len()
 	for i := len(arr) - num; i < len(arr); i++ {
